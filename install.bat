@@ -56,8 +56,8 @@ If %CurrentBuildNumber% GTR %BuildNumber% (
         Echo Already there Distribution in your system.
     ) Else (
         Echo
-        curl -L -C - https://github.com/deck-app/wsl-installer/releases/download/v1.0.0/deck-app.tar --output Deck-app.tar
-        wsl --import deck-app c:\deck-app Deck-app.tar
+        curl -L -C - https://github.com/deck-app/wsl-installer/releases/download/v1.0.0/deck-app.tar --output deck-app.tar
+        wsl --import deck-app c:\deck-app deck-app.tar
         wsl --set-version deck-app 2
         del Deck-app.tar
     )
