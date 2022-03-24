@@ -1,18 +1,15 @@
 @Echo off
-set "params=%*"
-cd /d "%~dp0" && ( if exist "%temp%\getadmin.vbs" del "%temp%\getadmin.vbs" ) && fsutil dirty query %systemdrive% 1>nul 2>nul || (  echo Set UAC = CreateObject^("Shell.Application"^) : UAC.ShellExecute "cmd.exe", "/k cd ""%~sdp0"" && %~s0 %params%", "", "runas", 1 >> "%temp%\getadmin.vbs" && "%temp%\getadmin.vbs" && exit /B )
 set BuildNumber=1902
 set Linuxverstion=Linux
 set VAR=Windows Subsystem for Linux Update
-@For /F %%A IN ('dism /online /get-featureinfo /featurename:VirtualMachinePlatform^|find "Disable" /C'
-) Do set VMP=%%A
 for /f "usebackq delims== tokens=2" %%x in (`wmic product where "Name= 'Windows Subsystem for Linux Update'" get Name /format:value`) do set VAR1=%%x
 for /f "usebackq delims== tokens=2" %%x in (`wmic os get BuildNumber /format:value`) do set CurrentBuildNumber=%%x
-for /f "usebackq delims== tokens=2" %%A in (`wmic service where "Name= 'LxssManager'" get Name /format:value`) do set SER=%%A
-if "%VMP%" == "0" if "%SER%" == "LxssManager" set res=true
+
 If %CurrentBuildNumber% GTR %BuildNumber% (
+    set "params=%*"
+    cd /d "%~dp0" && ( if exist "%temp%\getadmin.vbs" del "%temp%\getadmin.vbs" ) && fsutil dirty query %systemdrive% 1>nul 2>nul || (  echo Set UAC = CreateObject^("Shell.Application"^) : UAC.ShellExecute "cmd.exe", "/k cd ""%~sdp0"" && %~s0 %params%", "", "runas", 1 >> "%temp%\getadmin.vbs" && "%temp%\getadmin.vbs" && exit /B )
     Echo Checking for Windows Subsystem for Linux...
-    if "%res%" == "true" (
+    IF EXIST "%SystemRoot%\system32\wsl.exe" (
         Echo ...Windows Subsystem for Linux already installed.
     ) Else (
     @For /F %%A IN ('dism /online /get-featureinfo /featurename:VirtualMachinePlatform^|find "Enabled" /C'
@@ -27,7 +24,7 @@ If %CurrentBuildNumber% GTR %BuildNumber% (
     ) Else (
         Echo ...Windows Subsystem for Linux already installed.
     )
-    msg %username% Please restart your system, installed and configure WSL feature
+    msg %username% Please restart your system and install WSL
     goto :break
     )
     Echo ...Checking and Downloading WSL2 Kernel Update.
@@ -62,7 +59,7 @@ If %CurrentBuildNumber% GTR %BuildNumber% (
         curl -L -C - https://github.com/deck-app/wsl-installer/releases/download/v1.0.0/deck-app.tar --output deck-app.tar
         wsl --import deck-app c:\deck-app deck-app.tar
         wsl --set-version deck-app 2
-        del Deck-app.tar
+        del deck-app.tar
     )
 ) Else (
     Echo This PC doesn't meet the system requirements to upgrade your system minimum BuildNumber 1093
